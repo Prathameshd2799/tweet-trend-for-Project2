@@ -16,5 +16,15 @@ environment {
                 echo "build completed"
             }
         }
+            stage('SonarQube analysis') {
+             environment {
+             scannerHome = tool 'FQTS-sonarqube-scanner'
+                   }
+            steps{
+                withSonarQubeEnv('FQTS-sonarqube-server') { 
+                sh "${scannerHome}/bin/sonar-scanner"
+                }
+            }
+        }
     }
 }
