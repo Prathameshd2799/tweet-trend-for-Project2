@@ -18,7 +18,7 @@ environment {
         }
             stage('SonarQube analysis') {
              environment {
-             scannerHome = tool 'FQTS-sonarqube-scanner'
+             scannerHome = tool 'FQTS-sonar-scanner'
                    }
             steps{
                 withSonarQubeEnv('FQTS-sonarqube-server') { 
