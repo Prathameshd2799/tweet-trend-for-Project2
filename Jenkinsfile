@@ -29,7 +29,7 @@ environment {
         }
             stage("Jar Publish") {
             steps {
-            script {
+                 script {
                     echo '<--------------- Jar Publish Started --------------->'
                      def server = Artifactory.newServer url:registry+"/artifactory" ,  credentialsId:"jenkins-jforg-creds"
                      def properties = "buildid=${env.BUILD_ID},commitid=${GIT_COMMIT}";
@@ -37,7 +37,7 @@ environment {
                           "files": [
                             {
                               "pattern": "jarstaging/(*)",
-                              "target": "fqts-01pd-libs-release-local/{1}",
+                              "target": "jenkins-jfrog-libs-release-local/{1}",
                               "flat": "false",
                               "props" : "${properties}",
                               "exclusions": [ "*.sha1", "*.md5"]
