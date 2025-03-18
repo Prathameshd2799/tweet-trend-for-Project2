@@ -1,56 +1,55 @@
-def registry = 'https://fqts01pd.jfrog.io/'
 pipeline {
     agent {
         node {
             label 'maven'
         }
     }
-environment {
-    PATH = "/opt/apache-maven-3.9.9/bin:$PATH"
-}
+
+    environment {
+        PATH = "/opt/apache-maven-3.9.9/bin:$PATH"
+    }
+
     stages {
-        stage("build") {
+        stage("Build") {
             steps {
-               // git branch: 'main', url: 'https://github.com/Prathameshd2799/tweet-trend-for-Project2.git' 
-                echo "build started"
-                sh 'mvn clean deploy'
-                echo "build completed"
-            }
-        }
-            stage('SonarQube analysis') {
-             environment {
-             scannerHome = tool 'FQTS-sonar-scanner'
-                   }
-            steps{
-                withSonarQubeEnv('FQTS-sonarqube-server') { 
-                sh "${scannerHome}/bin/sonar-scanner"
+                script {
+                    echo "<--------------- Build Started --------------->"
+                    sh 'mvn clean deploy'
+                    echo "<--------------- Build Completed --------------->"
                 }
             }
         }
-            stage("Jar Publish") {
+
+        stage("SonarQube Analysis") {
+            environment {
+                scannerHome = tool 'FQTS-sonar-scanner'
+            }
             steps {
-                 script {
-                    echo '<--------------- Jar Publish Started --------------->'
-                     def server = Artifactory.newServer url:registry+"/artifactory" ,  credentialsId:"jenkins-jforg-creds"
-                     def properties = "buildid=${env.BUILD_ID},commitid=${GIT_COMMIT}";
-                     def uploadSpec = """{
-                          "files": [
-                            {
-                              "pattern": "jarstaging/(*)",
-                              "target": "jenkins-jfrog-libs-release-local/{1}",
-                              "flat": "false",
-                              "props" : "${properties}",
-                              "exclusions": [ "*.sha1", "*.md5"]
-                            }
-                         ]
-                     }"""
-                     def buildInfo = server.upload(uploadSpec)
-                     buildInfo.env.collect()
-                     server.publishBuildInfo(buildInfo)
-                     echo '<--------------- Jar Publish Ended --------------->'  
-            
-                   }
-              }   
-           }          
+                script {
+                    echo "<--------------- SonarQube Analysis Started --------------->"
+                    withSonarQubeEnv('FQTS-sonarqube-server') { 
+                        sh "${scannerHome}/bin/sonar-scanner"
+                    }
+                    echo "<--------------- SonarQube Analysis Completed --------------->"
+                }
+            }
+        }
+
+        stage("Configure Artifactory") {
+            steps {
+                script {
+                    withCredentials([string(credentialsId: 'artifactory-token', variable: 'ARTIFACTORY_TOKEN')]) {
+                        def rtServer = Artifactory.newServer(
+                            id: 'Artifactory-1',
+                            url: 'https://fqts01pd.jfrog.io/artifactory',
+                            username: 'prathameshdhalkar188@gmail.com',
+                            accessToken: ARTIFACTORY_TOKEN,
+                            bypassProxy: true,
+                            timeout: 300
+                        )
+                    }
+                }
+            }
+        }
     }
 }
