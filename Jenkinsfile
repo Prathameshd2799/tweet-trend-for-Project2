@@ -1,4 +1,4 @@
-def registry = 'https://fqts01pd.jfrog.io/'
+def registry = 'https://firstquad.jfrog.io/'
 pipeline {
     agent {
         node {
@@ -11,7 +11,7 @@ environment {
     stages {
         stage("build") {
             steps {
-               // git branch: 'main', url: 'https://github.com/Prathameshd2799/tweet-trend-for-Project2.git' 
+                // git branch: 'main', url: 'https://github.com/Prathameshd2799/tweet-trend-for-Project2.git' 
                 echo "build started"
                 sh 'mvn clean deploy'
                 echo "build completed"
