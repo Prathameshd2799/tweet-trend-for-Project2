@@ -19,10 +19,10 @@ pipeline {
         }    
             stage('SonarQube analysis') {
             environment {
-            scannerHome = tool 'fqts-sonar-scanner' 
+            scannerHome = tool 'FQTS-sonar-scanner'
                    }
             steps{
-                withSonarQubeEnv('fqts-sonar-server') { 
+                withSonarQubeEnv('FQTS-sonar-server') { 
                 sh "${scannerHome}/bin/sonar-scanner"
                 }
             }
